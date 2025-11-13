@@ -5,6 +5,10 @@
     position: relative;
     overflow: hidden;
   }
+  .Wave-center {
+    position: relative;
+    overflow: hidden;
+  }
   .ripple {
     position: absolute;
     border-radius: 50%;
@@ -130,8 +134,20 @@
     root
       .querySelectorAll(".Wave-all a, .Wave-all button, .Wave-all label")
       .forEach((el) => {
-        if (!el.classList.contains("Wave-cloud")) {                                                // Start from any direction
+        if (!el.classList.contains("Wave-cloud") && !el.classList.contains("Wave-center")) {
           el.classList.add("Wave-cloud");
+        }
+      });
+  }
+
+  // === Function to add class Wave-center to elements inside any Wave-all-center ===
+  function addWaveCenterClassInsideWaveAllCenter(root) {
+    if (!root) return;
+    root
+      .querySelectorAll(".Wave-all-center a, .Wave-all-center button, .Wave-all-center label")
+      .forEach((el) => {
+        if (!el.classList.contains("Wave-center") && !el.classList.contains("Wave-cloud")) {
+          el.classList.add("Wave-center");
         }
       });
   }
@@ -143,7 +159,11 @@
         addWaveClassInsideWaveAll(div);
       });
 
-      document.querySelectorAll(".Wave-cloud").forEach((btn) => {
+      document.querySelectorAll(".Wave-all-center").forEach((div) => {
+        addWaveCenterClassInsideWaveAllCenter(div);
+      });
+
+      document.querySelectorAll(".Wave-cloud, .Wave-center").forEach((btn) => {
         if (btn && !btn._waveEffectApplied) {
           applyWaveEffect(btn);
           btn._waveEffectApplied = true;
@@ -165,13 +185,21 @@
                 addWaveClassInsideWaveAll(node);
               }
 
+              if (node.classList && node.classList.contains("Wave-all-center")) {
+                addWaveCenterClassInsideWaveAllCenter(node);
+              }
+
               if (node.closest && node.closest(".Wave-all")) {
                 addWaveClassInsideWaveAll(node.closest(".Wave-all"));
               }
 
+              if (node.closest && node.closest(".Wave-all-center")) {
+                addWaveCenterClassInsideWaveAllCenter(node.closest(".Wave-all-center"));
+              }
+
               if (
                 node.classList &&
-                node.classList.contains("Wave-cloud") &&
+                (node.classList.contains("Wave-cloud") || node.classList.contains("Wave-center")) &&
                 !node._waveEffectApplied
               ) {
                 applyWaveEffect(node);
@@ -179,10 +207,13 @@
               }
 
               if (node.querySelectorAll) {
-                const waveAlls = node.querySelectorAll(".Wave-all");                                                // Add to all elements inside the div that contains wave elements; wave appears from any direction
+                const waveAlls = node.querySelectorAll(".Wave-all");
                 waveAlls.forEach((div) => addWaveClassInsideWaveAll(div));
 
-                const waveElements = node.querySelectorAll(".Wave-cloud");
+                const waveAllCenters = node.querySelectorAll(".Wave-all-center");
+                waveAllCenters.forEach((div) => addWaveCenterClassInsideWaveAllCenter(div));
+
+                const waveElements = node.querySelectorAll(".Wave-cloud, .Wave-center");
                 waveElements.forEach((el) => {
                   if (el && !el._waveEffectApplied) {
                     applyWaveEffect(el);
@@ -212,5 +243,3 @@
     observer.disconnect();
   });
 })();
-
-// I am Eyad Yaqoub from Egypt
